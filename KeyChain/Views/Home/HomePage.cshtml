@@ -1,0 +1,234 @@
+﻿@{
+    Layout = null; // Nếu không sử dụng layout chung
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyChain Display</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('/img/BackGroundKeyChain.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            position: relative;
+            width: 180px;
+            height: 360px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .paper-roll {
+            position: absolute;
+            top: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25%;
+            height: auto;
+            z-index: 2;
+            display: none;
+        }
+
+        .pig-keychain {
+            position: absolute;
+            bottom: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160%;
+            height: auto;
+            z-index: 1;
+            transition: transform 0.3s ease-in-out;
+        }
+
+		.vector {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 150%;
+			height: auto;
+			z-index: 1;
+			display: none;
+		}
+
+        .keychain {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: auto;
+            z-index: 2;
+			display: none;
+        }
+
+        .text-answer{
+            position: absolute;
+            bottom: -5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: auto;
+            z-index: 2;
+            font-size: 18px; 
+            font-family: 'AppareoBlackItalic', serif;
+            color: #625045;
+            text-align: center;
+			display: none;
+            white-space: pre-line;
+        }
+ 
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(-50%) rotate(0deg);
+            }
+
+            20% {
+                transform: translateX(-50%) rotate(-10deg);
+            }
+
+            40% {
+                transform: translateX(-50%) rotate(10deg);
+            }
+
+            60% {
+                transform: translateX(-50%) rotate(-10deg);
+            }
+
+            80% {
+                transform: translateX(-50%) rotate(10deg);
+            }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out 10;
+        }
+
+        @@keyframes moveUp {
+            0% {
+                top: 70%;
+                opacity: 0;
+            }
+
+            100% {
+                top: -30%;
+                opacity: 1;
+            }
+        }
+
+        .move-up {
+            display: block;
+            animation: moveUp 1.5s ease-in-out forwards;
+        }
+        .done{
+			display: none;
+        }
+
+
+        @@font-face {
+            font-family: 'AppareoBlackItalic';
+            src: url('/fonts/TH-HC Appareo Black Italic.otf') format('opentype');
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .switch-paper{
+			display: block;
+
+        }
+
+        .show {
+            display: block;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        @@keyframes fadeIn {
+            0%
+
+        {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+
+        }
+
+        @@keyframes flipScale {
+            0% {
+                transform: translate(-50%, -50%) scale(0.1) rotateY(0deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotateY(360deg);
+                opacity: 1;
+            }
+        }
+
+        .flip-scale {
+            animation: flipScale 1.5s ease-in-out forwards;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="/img/PaperRoll-removebg-preview.png" alt="Paper Roll" class="paper-roll" id="paperRoll">
+        <img src="/img/Pig-removebg-preview.png" alt="Pig Keychain" class="pig-keychain" id="pigKeychain">
+        <div class="quote-box">
+            <img src="/img/Vector.png" alt="Vector" class="vector" id="vector" />
+            <img src="/img/key/Sample.png" alt="KeyChain" class="keychain" id="keychain" />
+            <p id="text-answer" class="text-answer">@Html.Raw(ViewBag.Answer?.Replace("\n", "<br/>"))</p>
+        </div>
+    </div>
+
+    <script>
+                document.getElementById("pigKeychain").addEventListener("click", function() {
+            let pig = this;
+            let paperRoll = document.getElementById("paperRoll");
+            let vector = document.getElementById("vector");
+            let keychain = document.getElementById("keychain");
+            let textAnswer = document.getElementById("text-answer");
+
+            pig.classList.add("shake");
+
+            setTimeout(() => {
+                pig.classList.remove("shake");
+                paperRoll.classList.add("move-up");
+            }, 3000);
+
+            paperRoll.addEventListener("animationend", function() {
+                pig.classList.add("done");
+                paperRoll.classList.add("done");
+
+                vector.style.display = "block";
+                vector.classList.add("flip-scale");
+            });
+
+            vector.addEventListener("animationend", function() {
+                keychain.classList.add("show");
+                textAnswer.classList.add("show");
+            });
+        });
+
+
+    </script>
+</body>
+</html>
+
