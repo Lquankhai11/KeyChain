@@ -86,7 +86,6 @@
             color: #625045;
             text-align: center;
 			display: none;
-            white-space: pre-line;
         }
  
 
@@ -193,7 +192,7 @@
         <img src="/img/Pig-removebg-preview.png" alt="Pig Keychain" class="pig-keychain" id="pigKeychain">
         <div class="quote-box">
             <img src="/img/Vector.png" alt="Vector" class="vector" id="vector" />
-            <img src="/img/key/Sample.png" alt="KeyChain" class="keychain" id="keychain" />
+            <img src="/img/key/@Url.Content(ViewBag.KeyImage ?? "/img/key/Samle.png")" alt="KeyChain" class="keychain" id="keychain" />
             <p id="text-answer" class="text-answer">@Html.Raw(ViewBag.Answer?.Replace("\n", "<br/>"))</p>
         </div>
     </div>

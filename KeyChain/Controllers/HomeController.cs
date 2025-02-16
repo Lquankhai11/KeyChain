@@ -1,28 +1,67 @@
 ﻿using System.Diagnostics;
+using KeyChain.Helper;
 using KeyChain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace KeyChain.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly KeychainDbContext _context;
-        public HomeController(ILogger<HomeController> logger, KeychainDbContext context)
+        private readonly KeychainContext _context;
+        public HomeController(ILogger<HomeController> logger, KeychainContext context)
         {
             _logger = logger;
             _context = context;
         }
-
-        public IActionResult HomePage()
+        [Route("Home/HomePage/{code}")]
+        public IActionResult HomePage(string code)
         {
-            var randomAnswer = _context.RandomAnswers.OrderBy(x => Guid.NewGuid()).Select(r =>r.Answer).FirstOrDefault();
-            if (randomAnswer != null)
+            if (string.IsNullOrEmpty(code))
             {
-                Console.WriteLine($"DEBUG: {randomAnswer}"); // Kiểm tra chuỗi trong Console
-                _logger.LogInformation("Answer from DB: " + randomAnswer); // Ghi log để kiểm tra
+                return BadRequest("Hãy quét lại NFC trên móc khóa của bạn.");
             }
+            string productCode;
+            try
+            {
+                productCode = MyEncryptionHelper.Decrypt(code);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Lỗi giải mã mã sản phẩm: " + ex.Message);
+                return BadRequest("Mã sản phẩm không hợp lệ.");
+            }
+
+            var productExists = _context.Products.Include(p=>p.KeyImage).FirstOrDefault(p => p.ProductCode == productCode);
+            ViewBag.KeyImage = productExists?.KeyImage?.Image1;
+            if (productExists==null)
+            {
+                return NotFound("Mã sản phẩm không tồn tại.");
+            }
+            var randomAnswer = _context.RandomAnswers.OrderBy(x => Guid.NewGuid()).Select(r =>r.Answer).FirstOrDefault();
             ViewBag.Answer = randomAnswer ?? "Cạn lời rùi!";
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult GenerateCode()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult GenerateCode(string plainText)
+        {
+            if (string.IsNullOrWhiteSpace(plainText))
+            {
+                ViewBag.Error = "Vui lòng nhập dữ liệu cần mã hóa.";
+                return View();
+            }
+
+            var encryptedText = MyEncryptionHelper.Encrypt(plainText);
+            ViewBag.EncryptedText = encryptedText;
+            ViewBag.OriginalText = plainText;
             return View();
         }
 

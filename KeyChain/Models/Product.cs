@@ -12,4 +12,8 @@ public partial class Product
     public string? Answer { get; set; }
 
     public bool? MainPage { get; set; }
+
+    public int? KeyImageId { get; set; }
+
+    public virtual Image? KeyImage { get; set; }
 }

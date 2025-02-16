@@ -4,16 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KeyChain.Models;
 
-public partial class KeychainDbContext : DbContext
+public partial class KeychainContext : DbContext
 {
-    public KeychainDbContext()
+    public KeychainContext()
     {
     }
 
-    public KeychainDbContext(DbContextOptions<KeychainDbContext> options)
+    public KeychainContext(DbContextOptions<KeychainContext> options)
         : base(options)
     {
     }
+
+    public virtual DbSet<Image> Images { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
 
@@ -21,21 +23,34 @@ public partial class KeychainDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=(local);Database=Keychain;Trusted_Connection=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=(local);Database=Keychain;Trusted_Connection=True;TrustServerCertificate=True;ConnectRetryCount=3;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Image>(entity =>
+        {
+            entity.ToTable("Image");
+
+            entity.Property(e => e.Image1)
+                .HasMaxLength(400)
+                .HasColumnName("Image");
+        });
+
         modelBuilder.Entity<Product>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Product");
+            entity.HasKey(e => e.ProductCode);
 
-            entity.Property(e => e.Answer).HasMaxLength(400);
-            entity.Property(e => e.Image).HasMaxLength(200);
+            entity.ToTable("Product");
+
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.Answer).HasMaxLength(400);
+            entity.Property(e => e.Image).HasMaxLength(200);
+
+            entity.HasOne(d => d.KeyImage).WithMany(p => p.Products)
+                .HasForeignKey(d => d.KeyImageId)
+                .HasConstraintName("FK_Product_Image");
         });
 
         modelBuilder.Entity<RandomAnswer>(entity =>
