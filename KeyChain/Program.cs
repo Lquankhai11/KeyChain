@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<KeychainDbContext>(options =>
+builder.Services.AddDbContext<KeychainContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("KeychainDB")));
 var app = builder.Build();
 

@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Tạo mã mã hóa";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post" asp-action="GenerateCode">
+    <div class="form-group">
+        <label for="plainText">Nhập chuỗi cần mã hóa:</label>
+        <input type="text" class="form-control" id="plainText" name="plainText" placeholder="Ví dụ: ABC123" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Tạo mã</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.Error
+    </div>
+}
+
+@if (ViewBag.EncryptedText != null)
+{
+    <div class="alert alert-success mt-3">
+        <p><strong>Chuỗi gốc:</strong> @ViewBag.OriginalText</p>
+        <p><strong>Mã hóa:</strong> @ViewBag.EncryptedText</p>
+    </div>
+}
